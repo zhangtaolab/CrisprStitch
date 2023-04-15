@@ -13,14 +13,14 @@
     <template v-if="sampleInfo.length > 0" v-slot:top-right>
       <div class="q-gutter-sm">
         <q-btn
-          color="primary"
+          color="secondary"
           icon-right="archive"
           label="Export to csv"
           no-caps
           @click="exportTable"
         />
         <q-btn
-          color="primary"
+          color="secondary"
           icon-right="delete_forever"
           label="Delete selected"
           no-caps
@@ -28,10 +28,9 @@
         />
       </div>
     </template>
-    <template v-slot:no-data="{ icon, message }">
+    <template v-slot:no-data="{ message }">
       <div class="full-width row flex-center q-gutter-sm">
         <span>{{ message }}</span>
-        <q-icon size="2em" :name="icon" />
       </div>
     </template>
   </q-table>

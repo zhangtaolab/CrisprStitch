@@ -10,9 +10,8 @@ interface Sample {
 interface SampleInfo extends Sample {
   targetSeq: string;
   reads: {
-    seq: string;
-    count: number;
-  }[];
+    [key: string]: number;
+  };
 }
 
 export type { Sample, SampleInfo };

@@ -1,8 +1,5 @@
 import { Fastq, Sequence } from './fasta';
-// import { useSampleInfoStore } from 'src/stores/sampleinfo';
-import { useReadsStore } from 'src/stores/reads';
 
-const readsStore = useReadsStore();
 /**
  * works same as python zip function
  * @param its [a, b, c], [d, e, f]
@@ -38,13 +35,18 @@ async function* azip(...its: any[]) {
     yield rs.map((r) => r.value);
   }
 }
-
+/**
+ * simply read the merged file and count the haplotypes
+ * @param file file to read
+ * @param readingPgCallback show progress on page
+ */
 export async function countMerged(
   file: File,
+  cb: (s: string) => void,
   readingPgCallback?: (p: number) => void
 ) {
   for await (const i of new Fastq(file, readingPgCallback)) {
-    readsStore.addSeq(i.seq);
+    cb(i.seq);
   }
 }
 
@@ -52,10 +54,10 @@ export async function countMerged(
  * merge pairs in 2 fastq files
  * @param  args files to merge
  * @param  readingPgCallback show progress on page
- * @returns  merged haplotype and its count
  */
 export async function stitch(
   args: { filea: File; fileb: File; barcodeLength: number; pretty?: boolean },
+  cb: (s: string) => void,
   readingPgCallback?: (p: number) => void
 ): Promise<void> {
   // counter
@@ -74,7 +76,7 @@ export async function stitch(
         console.log(`>${sewing.reca.header} (${sewing.score})`);
         console.log(sewing.pretty);
       }
-      readsStore.addSeq(sewing.record.seq);
+      cb(sewing.record.seq);
     }
   }
   const duration: number = new Date().getTime() - starttime;

@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 
-const useReadsStore = defineStore('table', {
+const useReadsStore = defineStore('reads', {
   state: () => ({
-    reads: { '': 0 } as { [key: string]: number },
+    reads: {} as { [key: string]: number },
+    progress: 0,
   }),
   actions: {
     addSeq(read: string) {
@@ -11,9 +12,12 @@ const useReadsStore = defineStore('table', {
     setSeq(reads: { [key: string]: number }) {
       this.reads = reads;
     },
+    changeProgress(progress: number) {
+      this.$state.progress = progress;
+    },
   },
   getters: {
-    count(state) {
+    sumUp(state) {
       return Object.values(state.reads).reduce((a, b) => a + b, 0);
     },
   },

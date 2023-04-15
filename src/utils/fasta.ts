@@ -60,7 +60,7 @@ export class Fastq extends Fasta {
       const line = await new Promise<string>((resolve) =>
         this.filereader.readline((line: string) => resolve(line))
       );
-      const percentage = (this.filereader.fpos * 100) / this.file.size;
+      const percentage = this.filereader.fpos / this.file.size;
       if (line != '\n') {
         if (counter < 3) {
           rec[counter as 0 | 1 | 2 | 3] = line.trim();

@@ -8,7 +8,7 @@
           <q-avatar size="50px" style="background-color: #f0f8ff">
             <img src="../assets/icons/logo.png" />
           </q-avatar>
-          <q-btn flat label="CrisprStitch" />
+          <q-btn flat label="CrisprStitch" to="/" />
         </q-toolbar-title>
         <q-space />
         <q-tabs shrink stretch>
@@ -18,9 +18,12 @@
         <div class="q-pa-md">
           <q-btn
             color="secondary"
-            @click="$q.fullscreen.toggle()"
-            :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
-          />
+            @click="resetAll()"
+            icon="restart_alt"
+            to="/"
+          >
+            <q-tooltip> Reset all data </q-tooltip>
+          </q-btn>
         </div>
       </q-toolbar>
     </q-header>
@@ -46,11 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import EssentialLink, {
   EssentialLinkProps,
 } from 'components/EssentialLink.vue';
 import { useQuasar } from 'quasar';
+import { useSampleInfoStore } from 'src/stores/sampleinfo';
+import { useReadsStore } from 'src/stores/reads';
+import { LocalStorage } from 'quasar';
 
 const essentialLinks: EssentialLinkProps[] = [
   {
@@ -72,10 +78,22 @@ const essentialLinks: EssentialLinkProps[] = [
   },
 ];
 const $q = useQuasar();
-// const resultCalculated = ref(true);
+const leftDrawerOpen = ref(false);
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
-const leftDrawerOpen = ref(false);
+
+function resetAll() {
+  // TODO: interrupt running
+  useReadsStore().$reset();
+  useSampleInfoStore().$reset();
+  LocalStorage.clear();
+  $q.notify({
+    message: 'All data has been cleared',
+    color: 'positive',
+    position: 'top',
+    timeout: 1000,
+  });
+}
 </script>
