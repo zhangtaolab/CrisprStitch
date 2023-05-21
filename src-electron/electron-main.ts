@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron';
+import { app, BrowserWindow, nativeTheme, dialog } from 'electron';
 import path from 'path';
 import os from 'os';
 
@@ -42,6 +42,18 @@ function createWindow() {
       mainWindow?.webContents.closeDevTools();
     });
   }
+
+  mainWindow.on('close', function (e) {
+    const choice = dialog.showMessageBoxSync(mainWindow!, {
+      type: 'question',
+      buttons: ['Yes', 'No'],
+      title: 'Confirm',
+      message: 'Are you sure you want to quit? All data will be dropped.',
+    });
+    if (choice) {
+      e.preventDefault();
+    }
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = undefined;

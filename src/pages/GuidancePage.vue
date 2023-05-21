@@ -7,9 +7,9 @@
         icon="settings"
         :done="step > 1"
       >
-        For each ad campaign that you create, you can control how much you're
-        willing to spend on clicks and conversions, which networks and
-        geographical locations you want your ads to show on, and more.
+        <img style="width: 100%" class="image" src="../assets/img/step1.gif" />
+        <p>1.1 Import sample information separately or by a file.</p>
+        <p>1.2 Check and config sample information in the reactive table.</p>
       </q-step>
 
       <q-step
@@ -19,15 +19,14 @@
         icon="create_new_folder"
         :done="step > 2"
       >
-        An ad group contains one or more ads which target a shared set of
-        keywords.
+        <img style="width: 100%" class="image" src="../assets/img/step2.gif" />
+        <p>2 Import FASTQ files and target site sequences.</p>
       </q-step>
 
       <q-step :name="3" title="Get result" icon="assignment">
-        Try out different ad text to see what brings in the most customers, and
-        learn how to enhance your ads using features like ad extensions. If you
-        run into any problems with your ads, find out how to tell if they're
-        running and how to resolve approval issues.
+        <img style="width: 100%" class="image" src="../assets/img/step3.gif" />
+        <p>3.1 The first part is a summary table.</p>
+        <p>3.2 Downloadable charts for each group are provided.</p>
       </q-step>
 
       <template v-slot:navigation>

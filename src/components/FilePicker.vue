@@ -34,12 +34,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { readsMaster } from '../utils/master';
 import { Fasta } from 'src/utils/fasta';
 import { useSampleInfoStore } from 'src/stores/sampleinfo';
-import { LocalStorage, Notify } from 'quasar';
-import { useReadsStore } from 'src/stores/reads';
-import { stringLiteral } from '@babel/types';
+import { useWorkerStore } from 'src/stores/worker';
+import { Notify } from 'quasar';
 
 const model = ref(null);
 
@@ -75,7 +73,6 @@ const onChange = (value: File) => {
 };
 
 const readReads = () => {
-  const readsStore = useReadsStore();
   const sampleinfo = useSampleInfoStore();
   if (sampleinfo.count > 20) {
     Notify.create({
@@ -86,32 +83,13 @@ const readReads = () => {
     });
   }
   if (model.value) {
-    const workerURL = new URL('../worker/stitch.worker.ts', import.meta.url);
-    const worker = new Worker(workerURL, { type: 'module' });
-    worker.postMessage({
+    const worker = useWorkerStore();
+    worker.initWorker();
+    (worker.worker as Worker).postMessage({
       filea: model.value[0],
       fileb: model.value[1],
       barcodeLength: sampleinfo.barcodeLength,
     });
-    worker.onmessage = ({
-      data: { type, progress, toStore },
-    }: {
-      data: {
-        type: string;
-        progress: number | undefined;
-        toStore: string | undefined;
-      };
-    }) => {
-      switch (type) {
-        case 'progress':
-          readsStore.changeProgress(progress as number);
-          break;
-        case 'arrange':
-          sampleinfo.arrangeReads(LocalStorage.getAll());
-          if (toStore) LocalStorage.set(toStore, 1);
-          else LocalStorage.clear();
-      }
-    };
   } else {
     Notify.create({
       message: 'Reads file not selected.',

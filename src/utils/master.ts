@@ -14,7 +14,7 @@ class readsMaster {
 
   saveAsSequence(cb: (s: string) => void, pcb?: (p: number) => void) {
     if (this.files.length > 1) {
-      stitch(
+      return stitch(
         {
           filea: this.files[0],
           fileb: this.files[1],

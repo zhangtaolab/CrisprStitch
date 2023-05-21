@@ -59,7 +59,7 @@ export async function stitch(
   args: { filea: File; fileb: File; barcodeLength: number; pretty?: boolean },
   cb: (s: string) => void,
   readingPgCallback?: (p: number) => void
-): Promise<void> {
+): Promise<{ numcontigs: number; numtotal: number }> {
   // counter
   let [numcontigs, numtotes] = [0, 0];
   const starttime: number = new Date().getTime();
@@ -85,6 +85,10 @@ export async function stitch(
       duration / 1000
     } seconds`
   );
+  return {
+    numcontigs: numcontigs,
+    numtotal: numtotes,
+  };
 }
 
 /**

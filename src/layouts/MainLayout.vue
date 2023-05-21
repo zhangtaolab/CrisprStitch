@@ -49,13 +49,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import EssentialLink, {
   EssentialLinkProps,
 } from 'components/EssentialLink.vue';
 import { useQuasar } from 'quasar';
 import { useSampleInfoStore } from 'src/stores/sampleinfo';
-import { useReadsStore } from 'src/stores/reads';
+import { useWorkerStore } from 'src/stores/worker';
 import { LocalStorage } from 'quasar';
 
 const essentialLinks: EssentialLinkProps[] = [
@@ -85,8 +85,8 @@ function toggleLeftDrawer() {
 }
 
 function resetAll() {
-  // TODO: interrupt running
-  useReadsStore().$reset();
+  useWorkerStore().worker?.terminate();
+  useWorkerStore().$reset();
   useSampleInfoStore().$reset();
   LocalStorage.clear();
   $q.notify({

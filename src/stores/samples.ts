@@ -29,13 +29,9 @@ function revcomp(seq: string) {
 const useSampleInfoStore = defineStore('table', {
   state: () => ({
     sampleInfo: [] as SampleInfo[],
-    progress: 'not ready',
   }),
   actions: {
     addSample(sample: Sample) {
-      if (sample.group === 'None') {
-        sample.group = sample.name;
-      }
       this.sampleInfo.push({
         ...sample,
         targetSeq: '',
@@ -56,61 +52,34 @@ const useSampleInfoStore = defineStore('table', {
     },
     targetSeq(seq: Sequence) {
       this.sampleInfo.forEach((sample) => {
-        if (sample.gene === seq.header) {
+        if (sample.name === seq.header) {
           sample.targetSeq = seq.seq;
         }
       });
     },
-    arrangeReads(reads: { [key: string]: number }, last = false) {
+    arrangeReads(reads: { [key: string]: number }) {
       for (const read in reads) {
-        this.status('pending');
         for (let i = 0; i < this.sampleInfo.length; i++) {
           const sample = this.sampleInfo[i];
           const revcomp_barcode_R = revcomp(sample.barcode_R);
           const revcomp_barcode_L = revcomp(sample.barcode_L);
           const match =
-            read.startsWith(sample.barcode_L) &&
-            read.endsWith(revcomp_barcode_R);
+            (read.startsWith(sample.barcode_L) &&
+              read.endsWith(revcomp_barcode_R)) ||
+            (read.startsWith(revcomp_barcode_L) &&
+              read.endsWith(revcomp_barcode_R));
           const revmatch =
-            read.startsWith(sample.barcode_R) &&
-            read.endsWith(revcomp_barcode_L);
+            (read.startsWith(sample.barcode_R) &&
+              read.endsWith(revcomp_barcode_L)) ||
+            (read.startsWith(revcomp_barcode_R) &&
+              read.endsWith(revcomp_barcode_L));
           if (match) {
-            if (read in sample.reads) {
-              sample.reads[read] += reads[read];
-            } else {
-              sample.reads[read] = reads[read];
-            }
+            sample.reads[read] = reads[read];
           } else if (revmatch) {
-            const rvcpread = revcomp(read);
-            if (rvcpread in sample.reads) {
-              sample.reads[rvcpread] += reads[read];
-            } else {
-              sample.reads[rvcpread] = reads[read];
-            }
+            sample.reads[revcomp(read)] = reads[read];
           }
         }
       }
-      if (last) this.status('success');
-    },
-    checkSample() {
-      this.sampleInfo.forEach((sample) => {
-        if (sample.targetSeq === '') {
-          throw new Error(
-            `No target sequence found in provided file at sample ${sample.name}.`
-          );
-        }
-        if (sample.barcode_L.length !== sample.barcode_R.length) {
-          throw new Error(`Barcode length mismatch at sample ${sample.name}.`);
-        }
-        if (Object.keys(sample.reads).length === 0) {
-          throw new Error(
-            `No reads-barcode matching found at sample ${sample.name}.`
-          );
-        }
-      });
-    },
-    status(status: string) {
-      this.$state.progress = status;
     },
   },
   getters: {
@@ -125,13 +94,6 @@ const useSampleInfoStore = defineStore('table', {
     },
     barcodeLength(state) {
       return state.sampleInfo[0].barcode_L.length;
-    },
-    sumUp(state) {
-      return state.sampleInfo.reduce(
-        (acc, cur) =>
-          acc + Object.values(cur.reads).reduce((m, val) => m + val, 0),
-        0
-      );
     },
   },
 });

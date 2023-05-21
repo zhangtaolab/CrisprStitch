@@ -4,6 +4,8 @@ const useReadsStore = defineStore('reads', {
   state: () => ({
     reads: {} as { [key: string]: number },
     progress: 0,
+    lastprogress: 0,
+    lastTime: 0,
   }),
   actions: {
     addSeq(read: string) {
@@ -14,6 +16,19 @@ const useReadsStore = defineStore('reads', {
     },
     changeProgress(progress: number) {
       this.$state.progress = progress;
+    },
+    estimatedRemaining() {
+      const now = Date.now();
+      if (this.$state.lastTime === 0) {
+        this.$state.lastTime = now;
+        return -1;
+      } else {
+        const timeDiff = now - this.$state.lastTime;
+        const progressDiff = this.$state.progress - this.$state.lastprogress;
+        const remaining =
+          (timeDiff / progressDiff) * (1 - this.$state.progress);
+        return remaining;
+      }
     },
   },
   getters: {

@@ -1,21 +1,5 @@
 import { readsMaster } from 'src/utils/master';
 
-function saveToLocalStorage(seq: string) {
-  try {
-    if (localStorage.has(seq)) {
-      let stored = parseInt(localStorage.getItem(seq) as string);
-      localStorage.set(seq, stored++);
-    } else {
-      localStorage.set(seq, 1);
-    }
-  } catch (e) {
-    if (e instanceof DOMException) {
-      console.log('localStorage is full');
-      self.postMessage({ type: 'arrange', toStore: seq });
-    }
-  }
-}
-
 self.onmessage = ({
   data: { filea, fileb, barcodeLength },
 }: {
@@ -25,8 +9,25 @@ self.onmessage = ({
     fileb ? [filea, fileb] : [filea],
     barcodeLength
   );
-  master.saveAsSequence(saveToLocalStorage, (p: number) =>
-    self.postMessage({ type: 'progress', progress: p })
-  );
-  self.postMessage({ type: 'arrange' });
+  try {
+    const mergeResult = master.saveAsSequence(
+      (seq: string) => {
+        self.postMessage({ type: 'seq', result: seq });
+      },
+      (p: number) => self.postMessage({ type: 'progress', result: p })
+    );
+    if (mergeResult) {
+      mergeResult.then((result) => {
+        self.postMessage({
+          type: 'mergeResult',
+          result: result,
+        });
+      });
+    }
+  } catch (e) {
+    self.postMessage({
+      type: 'error',
+      result: (e as Error).message,
+    });
+  }
 };

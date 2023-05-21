@@ -228,16 +228,16 @@ export class jbfilereader {
                 this.inflater = new _inflater();
               }
             } else {
-              window.alert('Something wrong with the gzipped file!');
               reject();
+              throw 'Something wrong with the gzipped file. Plain file is recommended.';
             }
           }
           this.buffer += s;
           resolve();
         })
         ['catch'](function (s) {
-          window.alert('Something wrong while reading file!');
           reject();
+          throw 'Something wrong with the gzipped file. Plain file is recommended.';
         });
     });
     return chunkpromise;
