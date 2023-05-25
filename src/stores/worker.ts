@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import workerURL from 'src/worker/stitch.worker?worker';
 
 const useWorkerStore = defineStore('worker', {
   state: () => ({
@@ -6,8 +7,9 @@ const useWorkerStore = defineStore('worker', {
   }),
   actions: {
     initWorker() {
-      const workerURL = new URL('../worker/stitch.worker.ts', import.meta.url);
-      this.worker = new Worker(workerURL, { type: 'module' });
+      // const workerURL = new URL('../worker/stitch.worker.js', import.meta.url);
+      // this.worker = new Worker(workerURL, { type: 'module' });
+      this.worker = new workerURL();
     },
   },
 });

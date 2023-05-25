@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { useReadsStore } from 'src/stores/reads';
 import { useSampleInfoStore } from 'src/stores/sampleinfo';
-import { nextTick, ref, computed } from 'vue';
+import { nextTick, ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Notify, Loading } from 'quasar';
 import { useWorkerStore } from 'src/stores/worker';
@@ -79,6 +79,7 @@ import { LocalStorage } from 'quasar';
 import { Sample } from 'src/utils/alignment';
 import AlignedChart from 'src/components/AlignedChart.vue';
 import SummaryTable from 'src/components/SummaryTable.vue';
+import workerURL from 'src/worker/alignment.worker?worker';
 
 const readprgs = ref(0);
 const samplingprgs = ref('not ready');
@@ -130,10 +131,11 @@ const alignment = ref<
   }[]
 >([]);
 
-const align_worker = new Worker(
-  new URL('../worker/alignment.worker.ts', import.meta.url),
-  { type: 'module' }
-);
+// const align_worker = new Worker(
+//   new URL('../worker/alignment.worker.js', import.meta.url),
+//   { type: 'module' }
+// );
+const align_worker = new workerURL();
 align_worker.onmessage = ({
   data: { type, result },
 }: {
@@ -218,6 +220,21 @@ useSampleInfoStore().$subscribe((_, state) => {
   samplingprgs.value = state.progress;
 });
 
+onMounted(() => {
+  if (
+    useReadsStore().progress === 1 &&
+    useSampleInfoStore().progress === 'success'
+  ) {
+    align_worker.postMessage({
+      type: 'all',
+      samples: JSON.stringify(useSampleInfoStore().sampleInfo),
+    });
+    Loading.show({
+      delay: 400,
+    });
+  }
+});
+
 if (useWorkerStore().worker) {
   (useWorkerStore().worker as Worker).onmessage = ({
     data: { type, result },
@@ -273,14 +290,6 @@ if (useWorkerStore().worker) {
         } catch (e) {
           if (e instanceof DOMException) {
             console.log('LocalStorage is full, rearranging...');
-            Notify.create({
-              message: 'LocalStorage is full, rearranging...',
-              caption:
-                'If this message appears frequently, please consider split your input.',
-              color: 'accent',
-              position: 'top',
-              timeout: 8000,
-            });
             useSampleInfoStore().arrangeReads(LocalStorage.getAll());
             LocalStorage.clear();
             LocalStorage.set(seq, 1);

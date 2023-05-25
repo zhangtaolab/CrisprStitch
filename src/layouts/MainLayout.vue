@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue';
+import { ref } from 'vue';
 import EssentialLink, {
   EssentialLinkProps,
 } from 'components/EssentialLink.vue';

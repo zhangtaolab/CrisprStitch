@@ -5,7 +5,11 @@
     <div id="alignment-result"></div>
     <div align="center">
       <q-btn flat color="secondary" @click="download">Save chart</q-btn>
-      <q-btn flat color="secondary" @click="saveTXT(alignmentResult)"
+      <q-btn
+        flat
+        color="secondary"
+        v-if="alignmentResult.length > 0"
+        @click="saveTXT(alignmentResult)"
         >Save as txt</q-btn
       >
     </div>
