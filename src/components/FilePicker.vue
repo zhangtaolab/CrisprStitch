@@ -38,6 +38,7 @@ import { Fasta } from 'src/utils/fasta';
 import { useSampleInfoStore } from 'src/stores/sampleinfo';
 import { useWorkerStore } from 'src/stores/worker';
 import { Notify } from 'quasar';
+import { unzip } from 'src/utils/fflater';
 
 const model = ref(null);
 
@@ -90,6 +91,8 @@ const readReads = () => {
       fileb: model.value[1],
       barcodeLength: sampleinfo.barcodeLength,
     });
+    // console.log('fflate testing...')
+    // unzip(model.value)
   } else {
     Notify.create({
       message: 'Reads file not selected.',

@@ -1,5 +1,6 @@
 // import pako from './pako.min.js'
 import pako from 'pako';
+import { AsyncGunzip } from 'fflate';
 
 class _inflater {
   inflater_pako: any;
@@ -70,7 +71,11 @@ export class jbfilereadersync {
       const raw_array = new Uint8Array(this.reader.readAsArrayBuffer(blob));
       s = this.inflater.decompress(raw_array, this.islastchunk);
       if (s) {
-        if (this.inflater.ended && !this.islastchunk) {
+        // if (this.inflater.ended && !this.islastchunk) {
+        if (
+          this.inflater.ended &&
+          (this.inflater.strm.avail_in || !this.islastchunk)
+        ) {
           const remaining_bytes = this.inflater.strm.avail_in;
           let rel_pos = 0;
           while (
@@ -151,6 +156,101 @@ export class jbfilereadersync {
 }
 
 export class jbfilereader {
+  file: File;
+  gunzip: AsyncGunzip;
+  reader: ReadableStreamDefaultReader<Uint8Array>;
+  buffer: string;
+  eof: boolean;
+  gzipped: boolean;
+  filesize: number;
+  fpos: number;
+  lines: number;
+  constructor(file: File, gzipped: boolean) {
+    this.file = file;
+    this.gunzip = new AsyncGunzip();
+    this.reader = this.file.stream().getReader();
+    this.filesize = file.size;
+    this.fpos = 0;
+    this.buffer = '';
+    this.eof = false;
+    this.gzipped = gzipped;
+    this.lines = 0;
+    return;
+  }
+  readline(callback: (arg0: string) => void) {
+    if (this.eof) {
+      callback('');
+    }
+    const lfpos = this.buffer.indexOf('\n');
+    console.log('lfpos', lfpos);
+    console.log('buffer', this.buffer.length);
+    if (lfpos === -1) {
+      if (this.eof) {
+        const result = this.buffer;
+        this.buffer = '';
+        callback(result);
+      } else {
+        this._getchunk().then(() => {
+          return this.readline(callback);
+        });
+      }
+    } else {
+      let result: string;
+      if (this.buffer[lfpos - 1] === '\r') {
+        result = this.buffer.slice(0, lfpos - 1);
+      } else {
+        result = this.buffer.slice(0, lfpos);
+      }
+      this.lines += 1;
+      this.buffer = this.buffer.slice(lfpos + 1);
+      console.log('buffer reset');
+      callback(result);
+    }
+  }
+  private async _getchunk() {
+    const { done, value } = await this.reader.read();
+    return new Promise<void>((resolve, reject) => {
+      try {
+        if (this.gzipped) {
+          if (done) {
+            this.eof = true;
+            this.gunzip.push(new Uint8Array(0), true);
+            resolve();
+          } else {
+            this.gunzip.ondata = (_, chunk: Uint8Array, final) => {
+              if (final) {
+                console.log(this.lines + ' lines read');
+              }
+              this.buffer += new TextDecoder().decode(chunk);
+              // console.log(this.buffer.length, this.buffer);
+              this.fpos += value.length;
+              resolve();
+            };
+            this.gunzip.onmember = (offset: number) => {
+              console.log('offset', offset);
+            };
+            this.gunzip.push(value);
+          }
+        } else {
+          if (done) {
+            this.eof = true;
+            resolve();
+          } else {
+            this.buffer += new TextDecoder().decode(value);
+            this.fpos += value.length;
+            // console.log(this.buffer.length, this.fpos, value.length);
+            resolve();
+          }
+        }
+      } catch (err) {
+        reject(err);
+        throw 'Something wrong with the gzipped file: ' + err;
+      }
+    });
+  }
+}
+
+export class jbfilereaderpackup {
   file: File;
   gzipped: boolean;
   buffer: string;
