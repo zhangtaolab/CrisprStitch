@@ -222,12 +222,12 @@ export class jbfilereader {
                 console.log(this.lines + ' lines read');
               }
               this.buffer += new TextDecoder().decode(chunk);
-              // console.log(this.buffer.length, this.buffer);
+              console.log(chunk.length, final, this.buffer);
               this.fpos += value.length;
               resolve();
             };
             this.gunzip.onmember = (offset: number) => {
-              console.log('offset', offset);
+              this.fpos = offset;
             };
             this.gunzip.push(value);
           }
