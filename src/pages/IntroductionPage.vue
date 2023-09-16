@@ -6,21 +6,16 @@
         color="primary"
         to="/input"
         label="start"
-        size="large"
+        size="xl"
         icon="directions"
         flat
       />
     </div>
-    <!-- result picture here -->
-    <!-- chat formatted feature description -->
-    <!-- article abstract -->
-    <!-- requirements -->
-    <!-- support information -->
     <br />
     <div style="text-align: left">
       <!-- <h4>CrisprStitch: fast evaluate the efficiency of CRISPR-Cas systems</h4> -->
       <div class="row q-gutter-md justify-center">
-        <q-card class="my-card col-lg-3 col-6 col-md-4">
+        <q-card class="my-card col-lg-4 col-auto col-md-8 col-xs-10">
           <img src="../assets/img/stitching.jpeg" />
 
           <q-card-section>
@@ -36,7 +31,7 @@
             results (tables and histograms).
           </q-card-section>
         </q-card>
-        <q-card class="my-card col-lg-3 col-6 col-md-4">
+        <q-card class="my-card col-lg-4 col-auto col-md-8 col-xs-10">
           <img src="../assets/img/2023-05-2200.08.08.png" />
           <img src="../assets/img/2022-11-0209.20.22.png" />
           <q-card-section>
@@ -48,7 +43,7 @@
             size, insertion, insertion size, and substitution are included.
           </q-card-section>
         </q-card>
-        <q-card class="my-card col-lg-3 col-6 col-md-8">
+        <q-card class="my-card col-lg-3 col-auto col-md-8 col-xs-10">
           <q-card-section>
             <div class="text-h6">Requirements</div>
           </q-card-section>

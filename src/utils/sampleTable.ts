@@ -1,4 +1,4 @@
-import { jbfilereader } from './filereader';
+import { UltimateFilereader } from './filereader';
 import * as xlsx from 'xlsx';
 import { Notify } from 'quasar';
 // import { Sample } from '../store/interface'
@@ -17,7 +17,7 @@ const zip = (...rows: any[][]) =>
 class Table {
   file: File;
   format: string | undefined;
-  filereader: jbfilereader;
+  filereader: UltimateFilereader;
   withHeader: boolean;
   delimiter: string | undefined;
   header: string[];
@@ -60,7 +60,7 @@ class Table {
     }
     this.file = file;
     this.header = header;
-    this.filereader = new jbfilereader(file, false);
+    this.filereader = new UltimateFilereader(file, false);
     this.withHeader = withHeader;
   }
 

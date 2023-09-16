@@ -21,9 +21,10 @@ import { nextTick, onMounted } from 'vue';
 import * as echarts from 'echarts';
 import { AlignmentResult } from 'src/utils/alignment';
 import { multialign } from 'src/stores/interface';
-import * as pdfMake from 'pdfmake/build/pdfmake';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
+import { jsPDF } from 'jspdf';
+// import * as pdfMake from 'pdfmake/build/pdfmake';
+// import * as pdfFonts from 'pdfmake/build/vfs_fonts';
+// (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
 
 const props = defineProps({
   type: {
@@ -45,8 +46,8 @@ let chartIns: echarts.ECharts;
 onMounted(() => {
   chartIns = echarts.init(
     document.getElementById('echarts') as HTMLElement,
-    undefined,
-    { renderer: 'svg' }
+    undefined
+    // { renderer: 'svg' }
   );
   resetChart();
 });
@@ -64,13 +65,49 @@ function resetChart() {
   new AlignmentResult().draw(props.alignmentResult, props.type);
 }
 
-function download() {
-  pdfMake
-    .createPdf({
-      content: [{ svg: chartIns.renderToSVGString() }],
-      pageSize: { width: 1200, height: 'auto' },
-    })
-    .download();
+// Todo: export to element selectable svg&pdf files
+// function download() {
+//   console.log(chartIns.getDataURL());
+//   // pdfMake
+//   //   .createPdf({
+//   //     content: [{ svg: chartIns.renderToSVGString() }],
+//   //     pageSize: { width: chartIns.getWidth(), height: 'auto' },
+//   //   })
+//   //   .download();
+//   const pdf = new jsPDF()
+//   pdf.addImage(chartIns.getDataURL(), 'PNG', 0, 0, chartIns.getWidth(), chartIns)
+// }
+
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function getChartImage(chart: echarts.ECharts) {
+  return loadImage(chart.getDataURL({ type: 'png' }));
+}
+
+async function download() {
+  try {
+    const img1 = await getChartImage(chartIns);
+    const dpr1 = chartIns.getDevicePixelRatio();
+
+    const doc = new jsPDF({
+      unit: 'px',
+    });
+
+    doc.addImage(img1.src, 'PNG', 0, 0, img1.width / dpr1, img1.height / dpr1);
+
+    await doc.save('charts.pdf', {
+      returnPromise: true,
+    });
+  } catch (e) {
+    console.error('failed to export pdf', e);
+  }
 }
 
 function chartPreparation(

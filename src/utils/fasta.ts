@@ -1,4 +1,4 @@
-import { jbfilereader } from './filereader';
+import { UltimateFilereader } from './filereader';
 
 /**
  * read fasta file by line
@@ -6,12 +6,12 @@ import { jbfilereader } from './filereader';
  */
 export class Fasta {
   file: File;
-  filereader: jbfilereader;
+  filereader: UltimateFilereader;
   gzipped: boolean;
   constructor(file: File) {
     this.file = file;
     this.gzipped = this.file.name.match(/(\.gz)$/) ? true : false;
-    this.filereader = new jbfilereader(this.file, this.gzipped);
+    this.filereader = new UltimateFilereader(this.file, this.gzipped);
   }
 
   async *[Symbol.asyncIterator]() {

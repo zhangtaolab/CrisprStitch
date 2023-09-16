@@ -8,7 +8,11 @@
           <q-avatar size="50px" style="background-color: #f0f8ff">
             <img src="../assets/icons/logo.png" />
           </q-avatar>
-          <q-btn flat label="CrisprStitch" to="/" />
+          <q-btn
+            flat
+            :label="$q.screen.gt.xs ? 'CrisprStitch' : void 0"
+            to="/"
+          />
         </q-toolbar-title>
         <q-space />
         <q-tabs shrink stretch>
@@ -16,12 +20,7 @@
           <q-route-tab to="/guidance" label="Help" />
         </q-tabs>
         <div class="q-pa-md">
-          <q-btn
-            color="secondary"
-            @click="resetAll()"
-            icon="restart_alt"
-            to="/"
-          >
+          <q-btn color="red" @click="resetAll()" icon="restart_alt" to="/">
             <q-tooltip> Reset all data </q-tooltip>
           </q-btn>
         </div>
@@ -38,6 +37,22 @@
           v-bind="link"
         />
       </q-list>
+      <q-separator />
+      <q-item
+        clickable
+        tag="a"
+        href="https://zhangtaolab.org/software/crisprstitch"
+        target="_blank"
+        exact
+      >
+        <q-item-section avatar>
+          <q-icon name="info" />
+        </q-item-section>
+
+        <q-item-section>
+          <q-item-label>Download</q-item-label>
+        </q-item-section>
+      </q-item>
     </q-drawer>
 
     <q-page-container>

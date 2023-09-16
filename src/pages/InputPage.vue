@@ -11,11 +11,33 @@
         color="white"
         text-color="primary"
         :options="[
-          { label: 'Separately', value: 'one' },
-          { label: 'By file', value: 'two' },
-          { label: '96 well plate', value: 'three' },
+          { slot: 'one', value: 'one' },
+          { slot: 'two', value: 'two' },
+          { slot: 'three', value: 'three' },
         ]"
-      />
+      >
+        <template v-slot:one>
+          <q-icon name="list" />
+          <q-space />
+          <q-item-label>{{
+            $q.screen.gt.xs ? 'Separately' : void 0
+          }}</q-item-label>
+        </template>
+        <template v-slot:two>
+          <q-icon name="file_upload" />
+          <q-space />
+          <q-item-label>{{
+            $q.screen.gt.xs ? 'By file' : void 0
+          }}</q-item-label>
+        </template>
+        <template v-slot:three>
+          <q-icon name="grid_on" />
+          <q-space />
+          <q-item-label>{{
+            $q.screen.gt.xs ? '96 well plate' : void 0
+          }}</q-item-label>
+        </template>
+      </q-btn-toggle>
     </div>
   </div>
   <div class="row justify-center">
@@ -28,7 +50,7 @@
         <div class="row justify-center" v-if="inputMode === 'two'">
           <file-picker
             ref="sampleInput"
-            class="col-5"
+            class="col-10 col-md-5"
             hint="xls / xlsx / csv / tsv"
             label="Sample info"
             :on-change-callback="checkFileSure"
@@ -57,7 +79,7 @@
         <div class="row q-gutter-md justify-center">
           <file-picker
             ref="readsPicker"
-            class="col-5"
+            class="col-10 col-md-5"
             hint="fastq"
             label="Reads"
             :max_files="2"
@@ -65,7 +87,7 @@
           />
           <file-picker
             ref="targetPicker"
-            class="col-5"
+            class="col-10 col-md-5"
             hint="fasta"
             label="Target region"
             accept=".fa, .fasta, .fa.gz, .fasta.gz"

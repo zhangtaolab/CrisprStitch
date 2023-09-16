@@ -69,6 +69,13 @@
             label="Back"
             class="q-ml-sm"
           />
+          <q-btn
+            href="https://zhangtaolab.org/software/crisprstitch"
+            color="primary"
+            v-if="step === 3"
+            label="Video tutorial"
+            target="_blank"
+          />
         </q-stepper-navigation>
       </template>
     </q-stepper>

@@ -453,11 +453,11 @@ function overviewSetup(data: {
   }
   if (mc == 0) mc = tc;
   const [mr, rr, ior, dor, idr] = [
-    (mc / tc) * 100,
-    (rc / tc) * 100,
-    (ioc / tc) * 100,
-    (doc / tc) * 100,
-    (idc / tc) * 100,
+    setDecimalPrecision((mc / tc) * 100, 2),
+    setDecimalPrecision((rc / tc) * 100, 2),
+    setDecimalPrecision((ioc / tc) * 100, 2),
+    setDecimalPrecision((doc / tc) * 100, 2),
+    setDecimalPrecision((idc / tc) * 100, 2),
   ];
   return {
     Sample: data.sample.name,
@@ -473,5 +473,12 @@ function overviewSetup(data: {
     'insertion&deletion count': idc,
     'total read count': tc,
   };
+}
+
+function setDecimalPrecision(num: number, precision: number): string {
+  const roundedNum =
+    Math.round((num + Number.EPSILON) * 10 ** precision) / 10 ** precision;
+  const numStr = roundedNum.toFixed(precision);
+  return numStr;
 }
 </script>

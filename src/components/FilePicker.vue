@@ -38,7 +38,7 @@ import { Fasta } from 'src/utils/fasta';
 import { useSampleInfoStore } from 'src/stores/sampleinfo';
 import { useWorkerStore } from 'src/stores/worker';
 import { Notify } from 'quasar';
-import { unzip } from 'src/utils/fflater';
+// import { Gunzip } from 'fflate';
 
 const model = ref(null);
 
@@ -91,8 +91,27 @@ const readReads = () => {
       fileb: model.value[1],
       barcodeLength: sampleinfo.barcodeLength,
     });
-    // console.log('fflate testing...')
-    // unzip(model.value)
+    // console.log('fflate testing...');
+    // (model.value as File[]).map(async (file) => {
+    //   const gzip = new Gunzip();
+    //   const fileReader = file.stream().getReader();
+    //   gzip.ondata = (data, final) => {
+    //     if (data) {
+    //       console.log(new TextDecoder().decode(data));
+    //     }
+    //     if (final) {
+    //       console.log('done');
+    //     }
+    //   };
+    //   while (true) {
+    //     const { done, value } = await fileReader.read();
+    //     if (done) {
+    //       gzip.push(new Uint8Array(0), true);
+    //       break;
+    //     }
+    //     gzip.push(value);
+    //   }
+    // });
   } else {
     Notify.create({
       message: 'Reads file not selected.',

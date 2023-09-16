@@ -60,7 +60,7 @@ module.exports = configure(function (/* ctx */) {
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
-      // publicPath: '/',
+      publicPath: '/crisprstitch',
       // analyze: true,
       // env: {},
       // rawDefine: {}
@@ -82,7 +82,7 @@ module.exports = configure(function (/* ctx */) {
       extendWebpack(cfg) {
         cfg.module.rules.push({
           test: /\.worker\.(js|ts)$/,
-          exclude: /node_modules/,
+          exclude: [/node_modules/, /pdfmake.js$/],
           loader: 'workerize-loader',
           options: { inline: true },
         });
