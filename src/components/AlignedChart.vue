@@ -92,17 +92,25 @@ function getChartImage(chart: echarts.ECharts) {
 }
 
 async function download() {
+  const groupName = props.alignmentResult[0].sample.group;
   try {
     const img1 = await getChartImage(chartIns);
-    const dpr1 = chartIns.getDevicePixelRatio();
+    // const dpr1 = chartIns.getDevicePixelRatio();
 
     const doc = new jsPDF({
       unit: 'px',
     });
 
-    doc.addImage(img1.src, 'PNG', 0, 0, img1.width / dpr1, img1.height / dpr1);
+    doc.addImage(
+      img1.src,
+      'PNG',
+      0,
+      0,
+      chartIns.getWidth(),
+      chartIns.getHeight()
+    );
 
-    await doc.save('charts.pdf', {
+    await doc.save(groupName + '.pdf', {
       returnPromise: true,
     });
   } catch (e) {
