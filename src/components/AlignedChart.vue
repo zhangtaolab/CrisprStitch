@@ -22,9 +22,7 @@ import * as echarts from 'echarts';
 import { AlignmentResult } from 'src/utils/alignment';
 import { multialign } from 'src/stores/interface';
 import { jsPDF } from 'jspdf';
-// import * as pdfMake from 'pdfmake/build/pdfmake';
-// import * as pdfFonts from 'pdfmake/build/vfs_fonts';
-// (<any>pdfMake).vfs = pdfFonts.pdfMake.vfs;
+import 'svg2pdf.js';
 
 const props = defineProps({
   type: {
@@ -46,8 +44,8 @@ let chartIns: echarts.ECharts;
 onMounted(() => {
   chartIns = echarts.init(
     document.getElementById('echarts') as HTMLElement,
-    undefined
-    // { renderer: 'svg' }
+    undefined,
+    { renderer: 'svg' }
   );
   resetChart();
 });
@@ -65,50 +63,21 @@ function resetChart() {
   new AlignmentResult().draw(props.alignmentResult, props.type);
 }
 
-// Todo: export to element selectable svg&pdf files
-// function download() {
-//   console.log(chartIns.getDataURL());
-//   // pdfMake
-//   //   .createPdf({
-//   //     content: [{ svg: chartIns.renderToSVGString() }],
-//   //     pageSize: { width: chartIns.getWidth(), height: 'auto' },
-//   //   })
-//   //   .download();
-//   const pdf = new jsPDF()
-//   pdf.addImage(chartIns.getDataURL(), 'PNG', 0, 0, chartIns.getWidth(), chartIns)
-// }
-
-function loadImage(src: string) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-function getChartImage(chart: echarts.ECharts) {
-  return loadImage(chart.getDataURL({ type: 'png' }));
-}
-
 async function download() {
   const groupName = props.alignmentResult[0].sample.group;
+  const svgEle = document
+    .getElementById('echarts')
+    ?.getElementsByTagName('svg')[0];
+  svgEle?.getBoundingClientRect();
+  const width = (svgEle as any).width.baseVal.value;
+  const height = (svgEle as any).height.baseVal.value;
   try {
-    const img1 = await getChartImage(chartIns);
-    // const dpr1 = chartIns.getDevicePixelRatio();
+    const doc = new jsPDF(width > height ? 'l' : 'p', 'pt', [width, height]);
 
-    const doc = new jsPDF({
-      unit: 'px',
+    await doc.svg(svgEle as any, {
+      width,
+      height,
     });
-
-    doc.addImage(
-      img1.src,
-      'PNG',
-      0,
-      0,
-      chartIns.getWidth(),
-      chartIns.getHeight()
-    );
 
     await doc.save(groupName + '.pdf', {
       returnPromise: true,

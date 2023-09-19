@@ -1,6 +1,6 @@
 {
   "name": "crisprstitch",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "a fast tool to evaluate efficiency of CRISPR-Cas editing systems",
   "productName": "CrisprStitch",
   "author": "hanys",
@@ -11,15 +11,14 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.16.6",
     "bioseq": "^0.1.5",
     "echarts": "^5.4.2",
     "fflate": "^0.8.0",
-    "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
-    "pdfmake": "^0.2.7",
     "pinia": "^2.0.11",
-    "quasar": "^2.6.0",
+    "quasar": "^2.12.7",
+    "svg2pdf.js": "^2.2.2",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
     "xlsx": "^0.18.5"

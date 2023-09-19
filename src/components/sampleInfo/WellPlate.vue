@@ -131,7 +131,7 @@ const onAdd = () => {
   formInline.barcode_R =
     barcode_Rset.value[parseInt(position.value.split('-')[1])];
   const clone = JSON.parse(JSON.stringify(formInline));
-  if ((clone.group = '')) clone.group = 'None';
+  if (clone.group === '') clone.group = 'None';
   sampleInfo.addSample(clone);
   resetForm();
 };
