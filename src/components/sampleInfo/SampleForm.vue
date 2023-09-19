@@ -73,7 +73,8 @@ const form = ref();
 const onAdd = () => {
   const sampleInfo = useSampleInfoStore();
   const clone: Sample = JSON.parse(JSON.stringify(formInline));
-  if ((clone.group = '')) clone.group = 'None';
+  if (clone.group === '') clone.group = 'None';
+  console.log(clone);
   sampleInfo.addSample(clone);
   resetForm();
 };

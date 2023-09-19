@@ -27,13 +27,13 @@
         <q-btn
           flat
           color="secondary"
-          href="https://github.com/zhangtaolab/CrisprStitch/raw/main/assets/SRR5082532_1.fastq.gz"
+          href="https://bioinfor.yzu.edu.cn/download/crisprstitch/SRR5082532_1.fastq.gz"
           >fastq1</q-btn
         >
         <q-btn
           flat
           color="secondary"
-          href="https://github.com/zhangtaolab/CrisprStitch/raw/main/assets/SRR5082532_2.fastq.gz"
+          href="https://bioinfor.yzu.edu.cn/download/crisprstitch/SRR5082532_2.fastq.gz"
           >fastq2</q-btn
         >
         <q-btn flat color="secondary" @click="download_sample"
