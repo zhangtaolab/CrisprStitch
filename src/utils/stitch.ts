@@ -158,8 +158,6 @@ class Stitch {
       }
     }
 
-    // generate contig according to score
-
     // parta
     const parta = a;
     const qparta = this.reca.qual;

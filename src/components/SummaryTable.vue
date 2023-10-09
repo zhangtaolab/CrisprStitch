@@ -25,11 +25,19 @@
       </div>
     </template>
   </q-table>
+  <div class="row justify-center q-mt-md">
+    <q-pagination
+      v-model="pagination.page"
+      color="grey-8"
+      :max="pagesNumber"
+      size="sm"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { Notify, exportFile } from 'quasar';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 const props = defineProps({
   table: {
     type: Array,
@@ -43,6 +51,9 @@ const pagination = ref({
   page: 1,
   rowsPerPage: 5,
 });
+const pagesNumber = computed(() =>
+  Math.ceil(props.table.length / pagination.value.rowsPerPage)
+);
 
 interface Column {
   name: string;
