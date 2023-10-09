@@ -29,7 +29,7 @@
       placeholder="TTAGGC"
     />
     <q-input
-      v-model="formInline.barcode_L"
+      v-model="formInline.barcode_R"
       :rules="[required, validSeq]"
       label="Barcode R"
       ref="barcode_R"

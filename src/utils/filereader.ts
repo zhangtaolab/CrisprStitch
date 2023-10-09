@@ -1,5 +1,10 @@
 import { Gunzip } from 'fflate';
 
+/**
+ * read plain or gzipped file by line with pure javascript
+ * @param file file to read
+ * @param gzipped whether the file is gzipped
+ */
 export class UltimateFilereader {
   file: File;
   reader: ReadableStreamDefaultReader;
@@ -22,7 +27,7 @@ export class UltimateFilereader {
     this.gzip = new Gunzip();
     return;
   }
-  readline(callback: (arg0: string) => void) {
+  readline(callback: (line: string) => void) {
     const lfpos = this.buffer.indexOf('\n');
     if (lfpos === -1) {
       if (this.eof) {

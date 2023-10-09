@@ -73,6 +73,14 @@
         <div class="text-h6">Reads and target region sequences</div>
         <div class="text-subtitle2">
           reads can be pre-merged or paired-end files to merge.
+          <q-icon name="help">
+            <q-tooltip>
+              <div class="text-subtitle2">
+                Select both ends of fastq files in the first file input to merge
+                them. Merging will be skipped if only one file is selected.
+              </div>
+            </q-tooltip>
+          </q-icon>
         </div>
       </q-card-section>
       <q-card-section>

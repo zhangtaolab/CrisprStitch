@@ -4,7 +4,7 @@
       <q-card-section align="center">
         <img
           v-show="readprgs !== 1 && readprgs !== 0"
-          src="../assets/img/2023-05-1015.38.14.png"
+          src="../assets/img/crisprstitch-pHY287.jpg"
           style="width: 100%"
         />
         <q-linear-progress
@@ -341,7 +341,7 @@ if (useWorkerStore().worker) {
   const router = useRouter();
   router.push('/');
   Notify.create({
-    message: 'Redirected to homepage.',
+    message: 'Unexpected error! Redirected to homepage.',
     color: 'negative',
     icon: 'report_problem',
     position: 'top',
