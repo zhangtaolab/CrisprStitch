@@ -146,9 +146,9 @@ const checkFileSure = (file: File) => {
           name: line['Sample'],
           gene: line['Gene'],
           group: line['Group'] ? line['Group'] : 'None',
-          gRNA_PAM: line['gRNA_PAM'],
-          barcode_L: line['Barcode_L'],
-          barcode_R: line['Barcode_R'],
+          gRNA_PAM: line['gRNA_PAM'].toUpperCase(),
+          barcode_L: line['Barcode_L'].toUpperCase(),
+          barcode_R: line['Barcode_R'].toUpperCase(),
         });
       } catch {
         Notify.create({
