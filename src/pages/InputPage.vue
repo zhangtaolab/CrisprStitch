@@ -147,8 +147,8 @@ const checkFileSure = (file: File) => {
           gene: line['Gene'],
           group: line['Group'] ? line['Group'] : 'None',
           gRNA_PAM: line['gRNA_PAM'],
-          barcode_L: line['Barcode_L'],
-          barcode_R: line['Barcode_R'],
+          barcode_L: line['Barcode_L'] ? line['Barcode_L'] : 'None',
+          barcode_R: line['Barcode_R'] ? line['Barcode_R'] : 'None',
         });
       } catch {
         Notify.create({
@@ -192,6 +192,40 @@ const toresult = () => {
       icon: 'announcement',
     });
     return;
+  }
+  // verify empty-barcode sample
+  if (
+    sampleInfoStore.sampleInfo.some(
+      (sample) => sample.barcode_L === 'None' || sample.barcode_R === 'None'
+    )
+  ) {
+    if (
+      !sampleInfoStore.sampleInfo.some(
+        (sample) => sample.barcode_L === 'None' && sample.barcode_R === 'None'
+      )
+    ) {
+      Notify.create({
+        message: 'barcode_L and barcode_R must be both None or not None',
+        color: 'negative',
+        icon: 'announcement',
+      });
+      return;
+    } else {
+      let emptyCount = 0;
+      for (const sample of sampleInfoStore.sampleInfo) {
+        if (sample.barcode_L === 'None' && sample.barcode_R === 'None')
+          emptyCount += 1;
+      }
+      if (emptyCount > 1) {
+        Notify.create({
+          message:
+            'only one empty barcode sample is allowed, please check your info',
+          color: 'negative',
+          icon: 'announcement',
+        });
+        return;
+      }
+    }
   }
   targetPicker.value.readTargetSeq();
   readsPicker.value.readReads();
