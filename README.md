@@ -14,6 +14,9 @@ a fast tool to evaluate efficiency of CRISPR-Cas editing systems
 
 [Bilibili(CN)](https://www.bilibili.com/video/BV1cR4y1y7nX/?spm_id_from=333.999.0.0)
 
+## Join QQ group:
+551407271
+
 ---
 
 # For developers
