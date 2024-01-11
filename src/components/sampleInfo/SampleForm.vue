@@ -23,14 +23,14 @@
     />
     <q-input
       v-model="formInline.barcode_L"
-      :rules="[required, validSeq]"
+      :rules="[validSeq]"
       label="Barcode L"
       ref="barcode_L"
       placeholder="TTAGGC"
     />
     <q-input
       v-model="formInline.barcode_R"
-      :rules="[required, validSeq]"
+      :rules="[validSeq]"
       label="Barcode R"
       ref="barcode_R"
       placeholder="TGACCA"
@@ -72,9 +72,18 @@ const form = ref();
 
 const onAdd = () => {
   const sampleInfo = useSampleInfoStore();
-  const clone: Sample = JSON.parse(JSON.stringify(formInline));
-  if (clone.group === '') clone.group = 'None';
-  console.log(clone);
+  const clone: Sample = {
+    name: formInline.name,
+    gene: formInline.gene,
+    group: formInline.group ? formInline.group : 'None',
+    gRNA_PAM: formInline.gRNA_PAM.toUpperCase(),
+    barcode_L: formInline.barcode_L
+      ? formInline.barcode_L.toUpperCase()
+      : 'None',
+    barcode_R: formInline.barcode_R
+      ? formInline.barcode_R.toUpperCase()
+      : 'None',
+  };
   sampleInfo.addSample(clone);
   resetForm();
 };

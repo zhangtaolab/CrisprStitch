@@ -147,8 +147,12 @@ const checkFileSure = (file: File) => {
           gene: line['Gene'],
           group: line['Group'] ? line['Group'] : 'None',
           gRNA_PAM: line['gRNA_PAM'].toUpperCase(),
-          barcode_L: line['Barcode_L'].toUpperCase(),
-          barcode_R: line['Barcode_R'].toUpperCase(),
+          barcode_L: line['Barcode_L']
+            ? line['Barcode_L'].toUpperCase()
+            : 'None',
+          barcode_R: line['Barcode_R']
+            ? line['Barcode_R'].toUpperCase()
+            : 'None',
         });
       } catch {
         Notify.create({
@@ -192,6 +196,40 @@ const toresult = () => {
       icon: 'announcement',
     });
     return;
+  }
+  // verify empty-barcode sample
+  if (
+    sampleInfoStore.sampleInfo.some(
+      (sample) => sample.barcode_L === 'None' || sample.barcode_R === 'None'
+    )
+  ) {
+    if (
+      !sampleInfoStore.sampleInfo.some(
+        (sample) => sample.barcode_L === 'None' && sample.barcode_R === 'None'
+      )
+    ) {
+      Notify.create({
+        message: 'barcode_L and barcode_R must be both None or not None',
+        color: 'negative',
+        icon: 'announcement',
+      });
+      return;
+    } else {
+      let emptyCount = 0;
+      for (const sample of sampleInfoStore.sampleInfo) {
+        if (sample.barcode_L === 'None' && sample.barcode_R === 'None')
+          emptyCount += 1;
+      }
+      if (emptyCount > 1) {
+        Notify.create({
+          message:
+            'only one empty barcode sample is allowed, please check your info',
+          color: 'negative',
+          icon: 'announcement',
+        });
+        return;
+      }
+    }
   }
   targetPicker.value.readTargetSeq();
   readsPicker.value.readReads();

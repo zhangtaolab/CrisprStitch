@@ -66,6 +66,14 @@ const useSampleInfoStore = defineStore('table', {
         this.status('pending');
         for (let i = 0; i < this.sampleInfo.length; i++) {
           const sample = this.sampleInfo[i];
+          if (sample.barcode_L === 'None' || sample.barcode_R === 'None') {
+            if (read in sample.reads) {
+              sample.reads[read] += reads[read];
+            } else {
+              sample.reads[read] = reads[read];
+            }
+            continue;
+          }
           const revcomp_barcode_R = revcomp(sample.barcode_R);
           const revcomp_barcode_L = revcomp(sample.barcode_L);
           const match =
