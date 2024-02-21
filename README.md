@@ -62,8 +62,8 @@ quasar build
 
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
 
-### Citation
+## Citation
 
 If you use CrisprStitch in your research, please cite the following paper:
 
-Han YS†, Liu GQ†, Wu YC, Bao Y, Zhang Y*, Zhang T*.CrisprStitch: Fast evaluation of the efficiency of CRISPR editing systems. Plant Communications DOI: https://doi.org/10.1016/j.xplc.2023.100783
+Han YS†, Liu GQ†, Wu YC, Bao Y, Zhang Y*, Zhang T*. CrisprStitch: Fast evaluation of the efficiency of CRISPR editing systems. Plant Communications DOI: https://doi.org/10.1016/j.xplc.2023.100783
