@@ -3,6 +3,7 @@ ENV NODE_OPTIONS=--max_old_space_size=4096
 COPY package*.json ./
 RUN npm -g install @quasar/cli
 COPY ./ .
+RUN npm install
 RUN quasar build
 
 FROM nginx as production-stage
