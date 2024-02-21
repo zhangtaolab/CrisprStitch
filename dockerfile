@@ -7,7 +7,7 @@ RUN npm install
 RUN quasar build
 
 FROM nginx as production-stage
-COPY --from=build-stage /dist/src .
+COPY --from=build-stage /dist/spa .
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN sed -i 's#href=\"/#href=\"./#g' index.html
 RUN sed -i 's#src=\"/#src=\"./#g' index.html
