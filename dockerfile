@@ -1,4 +1,4 @@
-FROM node:16.4.0 as build-stage
+FROM node:16.15.0 as build-stage
 ENV NODE_OPTIONS=--max_old_space_size=4096
 COPY package*.json ./
 RUN npm -g install @quasar/cli
