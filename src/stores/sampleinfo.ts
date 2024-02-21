@@ -63,7 +63,7 @@ const useSampleInfoStore = defineStore('table', {
     },
     arrangeReads(reads: { [key: string]: number }, last = false) {
       for (const read in reads) {
-        this.status('pending');
+        if (this.$state.progress !== 'success') this.status('pending');
         for (let i = 0; i < this.sampleInfo.length; i++) {
           const sample = this.sampleInfo[i];
           if (sample.barcode_L === 'None' || sample.barcode_R === 'None') {

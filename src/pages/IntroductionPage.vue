@@ -66,6 +66,15 @@
               >hanyangshuo@zhangtaolab.org</q-btn
             >
           </q-card-section>
+          <q-card-section>
+            <div class="text-h6">Citation</div>
+            Han YS†, Liu GQ†, Wu YC, Bao Y, Zhang Y*, Zhang T*.
+            <a href="https://doi.org/10.1016/j.xplc.2023.100783"
+              >CrisprStitch: Fast evaluation of the efficiency of CRISPR editing
+              systems.</a
+            >
+            Plant Communications DOI: https://doi.org/10.1016/j.xplc.2023.100783
+          </q-card-section>
         </q-card>
       </div>
     </div>

@@ -37,6 +37,13 @@
           @update:model-value="groupAlign"
           label="Group"
         />
+        <!-- todo: direct download of all data-->
+        <!-- <q-btn
+          color="primary"
+          label="Download"
+          @click="downloadAll"
+          class="q-mt-md"
+        /> -->
       </q-card-section>
       <q-card-section v-if="chartData && alignmentResult">
         <q-btn-toggle
@@ -217,6 +224,7 @@ useReadsStore().$subscribe((_, state) => {
 });
 
 useSampleInfoStore().$subscribe((_, state) => {
+  console.log(state.progress);
   samplingprgs.value = state.progress;
 });
 
