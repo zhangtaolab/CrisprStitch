@@ -15,6 +15,7 @@ a fast tool to evaluate efficiency of CRISPR-Cas editing systems
 [Bilibili(CN)](https://www.bilibili.com/video/BV1cR4y1y7nX/?spm_id_from=333.999.0.0)
 
 ## Join QQ group:
+
 551407271
 
 ---
@@ -60,3 +61,9 @@ quasar build
 ### Customize the configuration
 
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+
+### Citation
+
+If you use CrisprStitch in your research, please cite the following paper:
+
+Han YS†, Liu GQ†, Wu YC, Bao Y, Zhang Y*, Zhang T*.CrisprStitch: Fast evaluation of the efficiency of CRISPR editing systems. Plant Communications DOI: https://doi.org/10.1016/j.xplc.2023.100783
