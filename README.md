@@ -10,9 +10,9 @@ a fast tool to evaluate efficiency of CRISPR-Cas editing systems
 
 ## Video tutorial
 
-[Youtube(EN)](https://www.youtube.com/watch?v=rnVo2CoyEhs&list=PLo8q8tqFX5J3IyY2Pk0dqc_v6tUvqL8F_&ab_channel=ZhangtaoLabTV)
+[Youtube(EN)](https://www.youtube.com/watch?v=zYwU-0t54wg&ab_channel=ZhangtaoLabTV)
 
-[Bilibili(CN)](https://www.bilibili.com/video/BV1cR4y1y7nX/?spm_id_from=333.999.0.0)
+[Bilibili(CN)](https://www.bilibili.com/video/BV1LN411b7Sa/?spm_id_from=333.999.0.0)
 
 ## Join QQ group:
 
