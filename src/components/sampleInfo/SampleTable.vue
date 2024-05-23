@@ -80,7 +80,7 @@ interface Column {
 const columns: Column[] = [
   {
     name: 'name',
-    label: 'Sample name',
+    label: 'Sample',
     field: (row: any) => row.name,
     format: (val: any) => `${val}`,
     align: 'left',
@@ -88,7 +88,7 @@ const columns: Column[] = [
   },
   {
     name: 'gene',
-    label: 'Gene name',
+    label: 'Gene',
     field: 'gene',
     align: 'left',
     sortable: true,

@@ -42,6 +42,7 @@ const props = defineProps({
 let chartIns: echarts.ECharts;
 
 onMounted(() => {
+  console.log(props.chartData, props.alignmentResult);
   chartIns = echarts.init(
     document.getElementById('echarts') as HTMLElement,
     undefined,

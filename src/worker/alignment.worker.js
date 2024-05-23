@@ -1,7 +1,7 @@
 import { Sample, sampleAlign, multiAlign } from 'src/utils/alignment';
 import { groupScratch } from 'src/utils/rendering';
 
-self.onmessage = ({ data: { type, samples } }) => {
+self.onmessage = ({ data: { type, samples, threshold } }) => {
   switch (type) {
     case 'group': {
       const multi_result = JSON.parse(samples);
@@ -14,8 +14,9 @@ self.onmessage = ({ data: { type, samples } }) => {
     }
     case 'all': {
       const parsed_samples = JSON.parse(samples);
+      const sample_number = parsed_samples.length;
       const multi_result = multiAlign(
-        parsed_samples.map((sample) => {
+        parsed_samples.map((sample, index) => {
           const sampleObj = new Sample(
             sample.name,
             sample.gene,
@@ -25,10 +26,30 @@ self.onmessage = ({ data: { type, samples } }) => {
             sample.group
           );
           sampleObj.sumUp(sample.reads);
+          console.log(sampleObj.sumup);
           sampleObj.getRef(sample.targetSeq);
+          console.log('threshold', threshold);
+          const chopped_reads = sampleObj.chopOff(
+            sample.reads,
+            Number(threshold)
+          );
+          console.log('choppedreads', chopped_reads);
+          console.log(
+            'length',
+            Object.keys(sample.reads).length,
+            Object.keys(chopped_reads).length
+          );
+          //todo: overchop warning
           return sampleAlign(
-            { sample: sampleObj, haplotype: sample.reads },
-            sample.targetSeq
+            { sample: sampleObj, haplotype: chopped_reads },
+            sample.targetSeq,
+            (p) =>
+              self.postMessage({
+                type: 'progress',
+                result: {
+                  progress: p / sample_number + index / sample_number,
+                },
+              })
           );
         })
       );

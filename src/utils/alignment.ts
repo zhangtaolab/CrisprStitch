@@ -67,6 +67,26 @@ class Sample {
       console.error(error); //todo: notify error report
     }
   }
+
+  chopOff(
+    haplotype: { [key: string]: number },
+    thresholdp = 0.005,
+    thresholdn = 0
+  ) {
+    const haplotype_keys = Object.keys(haplotype);
+    const haplotype_filtered: { [key: string]: number } = {};
+    if (this.sumup) {
+      for (const key of haplotype_keys) {
+        if (
+          haplotype[key] > thresholdn &&
+          haplotype[key] / this.sumup > thresholdp
+        ) {
+          haplotype_filtered[key] = haplotype[key];
+        }
+      }
+    }
+    return haplotype_filtered;
+  }
 }
 
 /**
@@ -77,13 +97,17 @@ class Sample {
  */
 function sampleAlign(
   hap_by_sample: { sample: Sample; haplotype: { [key: string]: number } },
-  targetSeq: string
+  targetSeq: string,
+  progressCallback?: (p: number) => void
 ) {
   const res = {
     sample: hap_by_sample.sample,
     haplotype: [] as { result: any; count: number }[],
   };
   hap_by_sample.sample.getRef(targetSeq);
+  //progress
+  if (progressCallback) progressCallback(0);
+  let progress = 0;
   for (const raw_query in hap_by_sample.haplotype) {
     const query = hap_by_sample.sample.reverse ? revcomp(raw_query) : raw_query;
     const rst = bioseq.align(hap_by_sample.sample.ref, query, false);
@@ -96,6 +120,8 @@ function sampleAlign(
       ),
       count: hap_by_sample.haplotype[raw_query],
     });
+    progress += 1 / Object.keys(hap_by_sample.haplotype).length;
+    if (progressCallback) progressCallback(progress);
   }
 
   return res;

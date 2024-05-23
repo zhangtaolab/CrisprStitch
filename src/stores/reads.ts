@@ -6,6 +6,7 @@ const useReadsStore = defineStore('reads', {
     progress: 0,
     lastprogress: 0,
     lastTime: 0,
+    threshold: 0.005,
   }),
   actions: {
     addSeq(read: string) {
@@ -29,6 +30,19 @@ const useReadsStore = defineStore('reads', {
           (timeDiff / progressDiff) * (1 - this.$state.progress);
         return remaining;
       }
+    },
+    setThreshold(threshold: string) {
+      const mapper: { [key: string]: number } = {
+        None: 0,
+        '0.1%': 0.001,
+        '0.5%': 0.005,
+        '1%': 0.01,
+        '3%': 0.03,
+        '5%': 0.05,
+        '10%': 0.1,
+        '15%': 0.15,
+      };
+      this.threshold = mapper[threshold] ? mapper[threshold] : 0;
     },
   },
   getters: {

@@ -3,7 +3,7 @@
     <q-card class="col-12 col-md-10 col-xl-8">
       <q-card-section align="center">
         <img
-          v-show="readprgs !== 1 && readprgs !== 0"
+          v-show="alignmentprgs <= 1"
           src="../assets/img/crisprstitch-pHY287.jpg"
           style="width: 100%"
         />
@@ -26,9 +26,26 @@
           rounded
           color="accent"
         />
+        <q-linear-progress
+          v-show="alignmentprgs <= 1 && alignmentprgs !== 0"
+          rounded
+          :value="alignmentprgs"
+        />
+        <q-badge
+          color="white"
+          text-color="primary"
+          v-show="alignmentprgs <= 1 && alignmentprgs !== 0"
+          :label="'Alignment: ' + (alignmentprgs * 100).toFixed(2) + '%'"
+        />
         <SummaryTable v-if="summaryTable.length > 0" :table="summaryTable" />
       </q-card-section>
-      <q-card-section v-show="readprgs === 1 && samplingprgs === 'success'">
+      <q-card-section
+        v-show="
+          alignmentprgs >= 1 &&
+          samplingprgs === 'success' &&
+          groupnames.length > 1
+        "
+      >
         <q-select
           rounded
           v-model="group"
@@ -90,6 +107,7 @@ import workerURL from 'src/worker/alignment.worker?worker';
 
 const readprgs = ref(0);
 const samplingprgs = ref('not ready');
+const alignmentprgs = ref(0);
 const group = ref('');
 // const groupnames = ref<(string | undefined)[]>([]);
 const groupnames = computed(() => useSampleInfoStore().groups);
@@ -181,6 +199,7 @@ align_worker.onmessage = ({
           [key: string]: any;
         };
       };
+      progress: number;
     };
   };
 }) => {
@@ -199,6 +218,8 @@ align_worker.onmessage = ({
         summaryTable.value.push(overviewSetup(sample));
       }
       Loading.hide();
+    case 'progress':
+      alignmentprgs.value = result.progress;
   }
 };
 
@@ -228,21 +249,6 @@ useSampleInfoStore().$subscribe((_, state) => {
   samplingprgs.value = state.progress;
 });
 
-onMounted(() => {
-  if (
-    useReadsStore().progress === 1 &&
-    useSampleInfoStore().progress === 'success'
-  ) {
-    align_worker.postMessage({
-      type: 'all',
-      samples: JSON.stringify(useSampleInfoStore().sampleInfo),
-    });
-    Loading.show({
-      delay: 400,
-    });
-  }
-});
-
 if (useWorkerStore().worker) {
   (useWorkerStore().worker as Worker).onmessage = ({
     data: { type, result },
@@ -260,9 +266,7 @@ if (useWorkerStore().worker) {
           align_worker.postMessage({
             type: 'all',
             samples: JSON.stringify(useSampleInfoStore().sampleInfo),
-          });
-          Loading.show({
-            delay: 400,
+            threshold: useReadsStore().threshold.toString(),
           });
           try {
             useSampleInfoStore().checkSample();
@@ -358,9 +362,6 @@ if (useWorkerStore().worker) {
 }
 
 function groupAlign(group: string) {
-  Loading.show({
-    delay: 400,
-  });
   const samples = useSampleInfoStore().sampleInfo.filter(
     (sample) => sample.group === group
   );

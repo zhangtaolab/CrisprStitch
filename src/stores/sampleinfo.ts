@@ -8,20 +8,20 @@ function revcomp(seq: string) {
     .reverse()
     .map(
       (b) =>
-        ({
-          A: 'T',
-          T: 'A',
-          G: 'C',
-          C: 'G',
-          R: 'Y',
-          Y: 'R',
-          a: 't',
-          t: 'a',
-          c: 'g',
-          g: 'c',
-          r: 'y',
-          y: 'r',
-        }[b])
+      ({
+        A: 'T',
+        T: 'A',
+        G: 'C',
+        C: 'G',
+        R: 'Y',
+        Y: 'R',
+        a: 't',
+        t: 'a',
+        c: 'g',
+        g: 'c',
+        r: 'y',
+        y: 'r',
+      }[b])
     )
     .join('');
 }
@@ -120,6 +120,18 @@ const useSampleInfoStore = defineStore('table', {
     status(status: string) {
       this.$state.progress = status;
     },
+    chopOff(sumup: number, thresholdn = 15, thresholdp = 0.005) {
+      this.sampleInfo.forEach((sample) => {
+        for (const read in sample.reads) {
+          if (
+            sample.reads[read] < sumup * thresholdp ||
+            sample.reads[read] < thresholdn
+          ) {
+            delete sample.reads[read];
+          }
+        }
+      });
+    }
   },
   getters: {
     count(state) {

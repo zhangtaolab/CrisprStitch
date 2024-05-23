@@ -17,7 +17,7 @@
     <q-input
       v-model="formInline.gRNA_PAM"
       :rules="[required, validSeq]"
-      label="gRNA PAM"
+      label="Target Sequence"
       ref="gRNA_PAM"
       placeholder="tttgGAGTGAAATCTCTTGTCTTAAGG"
     />
@@ -27,6 +27,7 @@
       label="Barcode L"
       ref="barcode_L"
       placeholder="TTAGGC"
+      :disable="non_barcode"
     />
     <q-input
       v-model="formInline.barcode_R"
@@ -34,6 +35,7 @@
       label="Barcode R"
       ref="barcode_R"
       placeholder="TGACCA"
+      :disable="non_barcode"
     />
     <q-input
       v-model="formInline.group"
@@ -50,6 +52,7 @@
       flat
       class="q-ml-sm"
     />
+    <q-toggle v-model="non_barcode" label="non-barcode mode" />
   </q-form>
 </template>
 
@@ -59,6 +62,8 @@ import { ref, reactive, nextTick } from 'vue';
 import { useSampleInfoStore } from '../../stores/sampleinfo';
 import { required, validSeq } from '../../utils/validator';
 import { Sample } from '../../stores/interface';
+
+const non_barcode = ref(false);
 
 const formInline = reactive<Sample>({
   name: '',
@@ -72,17 +77,23 @@ const form = ref();
 
 const onAdd = () => {
   const sampleInfo = useSampleInfoStore();
+  const barcode_L = formInline.barcode_L
+    ? non_barcode.value
+      ? 'None'
+      : formInline.barcode_L.toUpperCase()
+    : 'None';
+  const barcode_R = formInline.barcode_R
+    ? non_barcode.value
+      ? 'None'
+      : formInline.barcode_R.toUpperCase()
+    : 'None';
   const clone: Sample = {
     name: formInline.name,
     gene: formInline.gene,
     group: formInline.group ? formInline.group : 'None',
     gRNA_PAM: formInline.gRNA_PAM.toUpperCase(),
-    barcode_L: formInline.barcode_L
-      ? formInline.barcode_L.toUpperCase()
-      : 'None',
-    barcode_R: formInline.barcode_R
-      ? formInline.barcode_R.toUpperCase()
-      : 'None',
+    barcode_L: barcode_L,
+    barcode_R: barcode_R,
   };
   sampleInfo.addSample(clone);
   resetForm();

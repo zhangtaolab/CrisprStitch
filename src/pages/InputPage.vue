@@ -102,6 +102,17 @@
           />
         </div>
       </q-card-section>
+      <q-card-section>
+        <div class="row justify-end q-col-gutter-md">
+          <div class="col-3">
+            <q-select
+              :options="['None', '0.5%', '1%', '3%', '5%', '10%', '15%']"
+              v-model="threshold"
+              label="Filter Threshold"
+            ></q-select>
+          </div>
+        </div>
+      </q-card-section>
       <q-card-actions align="center">
         <q-btn
           flat
@@ -128,6 +139,7 @@ import { useSampleInfoStore } from '../stores/sampleinfo';
 import { Sample } from '../stores/interface';
 import { Table } from '../utils/sampleTable';
 import { Notify } from 'quasar';
+import { useReadsStore } from '../stores/reads';
 
 const inputMode = ref('one');
 const sampleInfo = ref<Sample[]>([]);
@@ -135,9 +147,11 @@ const sampleInput = ref();
 const readsPicker = ref();
 const targetPicker = ref();
 const sampleInfoStore = useSampleInfoStore();
+const threshold = ref('None');
 
 sampleInfoStore.$subscribe((_, state) => (sampleInfo.value = state.sampleInfo));
 
+//todo: csv quote problem
 const checkFileSure = (file: File) => {
   new Table(file).read((table) => {
     table.forEach((line) => {
@@ -231,6 +245,7 @@ const toresult = () => {
       }
     }
   }
+  useReadsStore().setThreshold(threshold.value);
   targetPicker.value.readTargetSeq();
   readsPicker.value.readReads();
 };
