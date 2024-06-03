@@ -20,12 +20,12 @@
             (readprgs * 100).toFixed(2) + '% Finish in : ' + estimated_remaining
           "
         />
-        <q-linear-progress
+        <!-- <q-linear-progress
           v-show="samplingprgs == 'pending'"
           indeterminate
           rounded
           color="accent"
-        />
+        /> -->
         <q-linear-progress
           v-show="alignmentprgs <= 1 && alignmentprgs !== 0"
           rounded
@@ -39,13 +39,7 @@
         />
         <SummaryTable v-if="summaryTable.length > 0" :table="summaryTable" />
       </q-card-section>
-      <q-card-section
-        v-show="
-          alignmentprgs >= 1 &&
-          samplingprgs === 'success' &&
-          groupnames.length > 1
-        "
-      >
+      <q-card-section v-show="alignmentprgs >= 1 && groupnames.length > 1">
         <q-select
           rounded
           v-model="group"
@@ -106,9 +100,9 @@ import SummaryTable from 'src/components/SummaryTable.vue';
 import workerURL from 'src/worker/alignment.worker?worker';
 
 const readprgs = ref(0);
-const samplingprgs = ref('not ready');
 const alignmentprgs = ref(0);
 const group = ref('');
+const numcontig = ref(-1);
 // const groupnames = ref<(string | undefined)[]>([]);
 const groupnames = computed(() => useSampleInfoStore().groups);
 const estimated_remaining = ref();
@@ -119,6 +113,7 @@ const alignmentResult = ref();
 
 const alignedChart = ref();
 const summaryTable = ref([] as { [key: string]: any }[]);
+const router = useRouter();
 
 let chart_data: {
   groupsvgjson: string;
@@ -156,10 +151,6 @@ const alignment = ref<
   }[]
 >([]);
 
-// const align_worker = new Worker(
-//   new URL('../worker/alignment.worker.js', import.meta.url),
-//   { type: 'module' }
-// );
 const align_worker = new workerURL();
 align_worker.onmessage = ({
   data: { type, result },
@@ -200,12 +191,16 @@ align_worker.onmessage = ({
         };
       };
       progress: number;
+      message: string;
+      origin: number;
+      sample: string;
     };
   };
 }) => {
   switch (type) {
     case 'group':
       chart_data = result.chart_data;
+      console.log(chart_data);
       chartData.value = chart_data.deletionChart;
       alignedChart.value.resetChart();
       Loading.hide();
@@ -218,8 +213,34 @@ align_worker.onmessage = ({
         summaryTable.value.push(overviewSetup(sample));
       }
       Loading.hide();
+      break;
     case 'progress':
       alignmentprgs.value = result.progress;
+      break;
+    case 'error':
+      Notify.create({
+        message:
+          result.message +
+          ': ' +
+          result.origin +
+          ' haplotypes from sample ' +
+          result.sample +
+          ' all filtered. Please modify the threshold.',
+        color: 'negative',
+        icon: 'report_problem',
+        position: 'top',
+        timeout: 0,
+        actions: [
+          {
+            label: 'Dismiss',
+            color: 'white',
+            handler: () => {
+              router.push('/');
+            },
+          },
+        ],
+      });
+      break;
   }
 };
 
@@ -232,9 +253,9 @@ const estimateTime = setInterval(() => {
     estimated_remaining.value = '0';
   } else if (time < 60) {
     estimated_remaining.value = time.toFixed(2) + 's';
-  } else if (time < 3600) {
+  } else if (time < 600) {
     estimated_remaining.value = (time / 60).toFixed(2) + 'm';
-  } else estimated_remaining.value = (time / 3600).toFixed(2) + 'h';
+  } else estimated_remaining.value = '> 10m';
 }, 1000);
 
 useReadsStore().$subscribe((_, state) => {
@@ -242,11 +263,6 @@ useReadsStore().$subscribe((_, state) => {
   if (state.progress === 1) {
     clearInterval(estimateTime);
   }
-});
-
-useSampleInfoStore().$subscribe((_, state) => {
-  console.log(state.progress);
-  samplingprgs.value = state.progress;
 });
 
 if (useWorkerStore().worker) {
@@ -261,41 +277,14 @@ if (useWorkerStore().worker) {
     switch (type) {
       case 'progress':
         useReadsStore().changeProgress(result as number);
-        if (result === 1) {
-          useSampleInfoStore().arrangeReads(LocalStorage.getAll(), true);
-          align_worker.postMessage({
-            type: 'all',
-            samples: JSON.stringify(useSampleInfoStore().sampleInfo),
-            threshold: useReadsStore().threshold.toString(),
-          });
-          try {
-            useSampleInfoStore().checkSample();
-          } catch (e) {
-            Notify.create({
-              message: (e as Error).message,
-              color: 'negative',
-              icon: 'report_problem',
-              position: 'top',
-              timeout: 0,
-              actions: [
-                {
-                  label: 'Dismiss',
-                  color: 'white',
-                  handler: () => {
-                    /* ... */
-                  },
-                },
-              ],
-            });
-          }
-        }
         break;
       case 'seq':
         const seq = result as string;
         try {
           if (LocalStorage.has(seq)) {
-            let stored = LocalStorage.getItem(seq as string);
-            LocalStorage.set(seq, (stored as number)++);
+            const stored = LocalStorage.getItem(seq as string);
+            const incremented = (stored as number) + 1;
+            LocalStorage.set(seq, incremented);
           } else {
             LocalStorage.set(seq, 1);
           }
@@ -310,6 +299,7 @@ if (useWorkerStore().worker) {
         break;
       case 'mergeResult':
         const mergeResult = result as { numcontigs: number; numtotal: number };
+        numcontig.value = mergeResult.numcontigs;
         if (mergeResult.numcontigs / mergeResult.numtotal < 0.5) {
           Notify.create({
             message: `Combined only ${mergeResult.numcontigs} in ${mergeResult.numtotal} reads pairs.  Please check your input.`,
@@ -322,12 +312,71 @@ if (useWorkerStore().worker) {
                 label: 'Dismiss',
                 color: 'white',
                 handler: () => {
-                  /* ... */
+                  router.push('/');
+                  useWorkerStore().worker?.terminate();
+                  useWorkerStore().$reset();
+                  useSampleInfoStore().$reset();
+                  LocalStorage.clear();
                 },
               },
             ],
           });
         }
+        useSampleInfoStore().arrangeReads(LocalStorage.getAll());
+        align_worker.postMessage({
+          type: 'all',
+          samples: JSON.stringify(useSampleInfoStore().sampleInfo),
+          threshold: useReadsStore().threshold.toString(),
+        });
+        try {
+          useSampleInfoStore().checkSample();
+        } catch (e) {
+          Notify.create({
+            message: (e as Error).message,
+            color: 'negative',
+            icon: 'report_problem',
+            position: 'top',
+            timeout: 0,
+            actions: [
+              {
+                label: 'Dismiss',
+                color: 'white',
+                handler: () => {
+                  router.push('/');
+                  useWorkerStore().worker?.terminate();
+                  useWorkerStore().$reset();
+                  useSampleInfoStore().$reset();
+                  LocalStorage.clear();
+                },
+              },
+            ],
+          });
+        }
+        setTimeout(() => {
+          if (alignmentprgs.value < 1) {
+            Notify.create({
+              message:
+                'Alignment is taking too long, please check your input. Consider resetting threshold.',
+              color: 'negative',
+              icon: 'report_problem',
+              position: 'top',
+              timeout: 0,
+              actions: [
+                {
+                  label: 'return to homepage',
+                  color: 'white',
+                  handler: () => {
+                    router.push('/');
+                    useWorkerStore().worker?.terminate();
+                    useWorkerStore().$reset();
+                    useSampleInfoStore().$reset();
+                    LocalStorage.clear();
+                  },
+                },
+              ],
+            });
+          }
+        }, 36000000);
         break;
       case 'error':
         Notify.create({
@@ -341,7 +390,11 @@ if (useWorkerStore().worker) {
               label: 'Dismiss',
               color: 'white',
               handler: () => {
-                /* ... */
+                router.push('/');
+                useWorkerStore().worker?.terminate();
+                useWorkerStore().$reset();
+                useSampleInfoStore().$reset();
+                LocalStorage.clear();
               },
             },
           ],
@@ -350,7 +403,6 @@ if (useWorkerStore().worker) {
     }
   };
 } else {
-  const router = useRouter();
   router.push('/');
   Notify.create({
     message: 'Unexpected error! Redirected to homepage.',
@@ -364,9 +416,6 @@ if (useWorkerStore().worker) {
 function groupAlign(group: string) {
   const samples = useSampleInfoStore().sampleInfo.filter(
     (sample) => sample.group === group
-  );
-  const groupAlignment = alignment.value.filter(
-    (sample) => sample.sample.group === group
   );
   if (
     !Object.values(samples).every(
@@ -384,7 +433,11 @@ function groupAlign(group: string) {
           label: 'Dismiss',
           color: 'white',
           handler: () => {
-            /* ... */
+            router.push('/');
+            useWorkerStore().worker?.terminate();
+            useWorkerStore().$reset();
+            useSampleInfoStore().$reset();
+            LocalStorage.clear();
           },
         },
       ],
@@ -392,6 +445,15 @@ function groupAlign(group: string) {
     });
     return;
   }
+  const groupAlignment = alignment.value
+    .filter((sample) => sample.sample.group === group)
+    .map((sample) => {
+      const { res, ...rest } = sample;
+      return {
+        ...rest,
+        res: res.slice(0, 2000), // reduce haplotype amount
+      };
+    });
   align_worker.postMessage({
     type: 'group',
     samples: JSON.stringify(groupAlignment),
@@ -442,7 +504,8 @@ function overviewSetup(data: {
 }) {
   const tc = data.sample.sumup as number;
   let [mc, rc, ioc, doc, idc] = [0, 0, 0, 0, 0];
-  for (const re of data.res) {
+  const reduced_res = data.res.slice(0, 5000); // reduce haplotype amount
+  for (const re of reduced_res) {
     if (re.query === data.sample.ref && re.insertions.length == 0) {
       mc = tc - re.count;
     } else {

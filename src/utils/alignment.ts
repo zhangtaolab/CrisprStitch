@@ -51,21 +51,21 @@ class Sample {
    */
   getRef(geneseq: string) {
     let ref = geneseq.toUpperCase();
-    let rev = false;
     if (ref.indexOf(this.gRNA_PAM) == -1) {
       ref = revcomp(geneseq);
-      rev = true;
+      this.reverse = true;
     }
-    try {
-      const gRNA_PAM_pos = ref.indexOf(this.gRNA_PAM);
-      this.ref = ref.slice(
-        gRNA_PAM_pos > 70 ? gRNA_PAM_pos - 70 : 0,
-        gRNA_PAM_pos + 70 + this.gRNA_PAM.length
-      );
-      this.reverse = rev;
-    } catch (error) {
-      console.error(error); //todo: notify error report
-    }
+    // try {
+    //   const gRNA_PAM_pos = ref.indexOf(this.gRNA_PAM);
+    //   this.ref = ref.slice(
+    //     gRNA_PAM_pos > 70 ? gRNA_PAM_pos - 70 : 0,
+    //     gRNA_PAM_pos + 70 + this.gRNA_PAM.length
+    //   );
+    //   this.reverse = rev;
+    // } catch (error) {
+    //   console.error(error); //todo: notify error report
+    // }
+    this.ref = geneseq;
   }
 
   chopOff(
@@ -123,7 +123,6 @@ function sampleAlign(
     progress += 1 / Object.keys(hap_by_sample.haplotype).length;
     if (progressCallback) progressCallback(progress);
   }
-
   return res;
 }
 
@@ -133,18 +132,18 @@ function revcomp(seq: string) {
     .reverse()
     .map(
       (a) =>
-        ((
-          {
-            A: 'T',
-            T: 'A',
-            G: 'C',
-            C: 'G',
-            a: 't',
-            t: 'a',
-            c: 'g',
-            g: 'c',
-          } as { [key: string]: string }
-        )[a])
+      ((
+        {
+          A: 'T',
+          T: 'A',
+          G: 'C',
+          C: 'G',
+          a: 't',
+          t: 'a',
+          c: 'g',
+          g: 'c',
+        } as { [key: string]: string }
+      )[a])
     )
     .join('');
 }

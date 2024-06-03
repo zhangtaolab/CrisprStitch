@@ -151,7 +151,7 @@ const exportTable = () => {
     // .split('\n').join('\\n')
     // .split('\r').join('\\r')
 
-    return `"${formatted}"`;
+    return `${formatted}`;
   }
   // naive encoding to csv format
   const content = [columns.map((col) => wrapCsvValue(col.label))]

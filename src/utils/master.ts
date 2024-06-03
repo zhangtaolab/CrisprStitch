@@ -1,6 +1,7 @@
 import { stitch, countMerged } from './stitch';
 
 class readsMaster {
+  //todo: multithread
   files: File[];
   gzipped: boolean;
   barcodeLength: number;

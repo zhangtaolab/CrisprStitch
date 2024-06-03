@@ -26,20 +26,22 @@ self.onmessage = ({ data: { type, samples, threshold } }) => {
             sample.group
           );
           sampleObj.sumUp(sample.reads);
-          console.log(sampleObj.sumup);
           sampleObj.getRef(sample.targetSeq);
-          console.log('threshold', threshold);
           const chopped_reads = sampleObj.chopOff(
             sample.reads,
             Number(threshold)
           );
-          console.log('choppedreads', chopped_reads);
-          console.log(
-            'length',
-            Object.keys(sample.reads).length,
-            Object.keys(chopped_reads).length
-          );
           //todo: overchop warning
+          if (Object.keys(chopped_reads).length === 0) {
+            self.postMessage({
+              type: 'error',
+              result: {
+                message: 'Overchop warning',
+                origin: Object.keys(sample.reads).length,
+                sample: sample.name,
+              },
+            });
+          }
           return sampleAlign(
             { sample: sampleObj, haplotype: chopped_reads },
             sample.targetSeq,

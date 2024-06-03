@@ -29,7 +29,7 @@ function revcomp(seq: string) {
 const useSampleInfoStore = defineStore('table', {
   state: () => ({
     sampleInfo: [] as SampleInfo[],
-    progress: 'not ready',
+    progress: 0,
   }),
   actions: {
     addSample(sample: Sample) {
@@ -61,18 +61,18 @@ const useSampleInfoStore = defineStore('table', {
         }
       });
     },
-    arrangeReads(reads: { [key: string]: number }, last = false) {
+    arrangeReads(reads: { [key: string]: number }) {
       for (const read in reads) {
-        if (this.$state.progress !== 'success') this.status('pending');
+        this.statusIncrement();
         for (let i = 0; i < this.sampleInfo.length; i++) {
           const sample = this.sampleInfo[i];
-          if (sample.barcode_L === 'None' || sample.barcode_R === 'None') {
+          if (sample.barcode_L === 'None' && sample.barcode_R === 'None') {
             if (read in sample.reads) {
               sample.reads[read] += reads[read];
             } else {
               sample.reads[read] = reads[read];
             }
-            continue;
+            break;
           }
           const revcomp_barcode_R = revcomp(sample.barcode_R);
           const revcomp_barcode_L = revcomp(sample.barcode_L);
@@ -98,7 +98,6 @@ const useSampleInfoStore = defineStore('table', {
           }
         }
       }
-      if (last) this.status('success');
     },
     checkSample() {
       this.sampleInfo.forEach((sample) => {
@@ -117,8 +116,9 @@ const useSampleInfoStore = defineStore('table', {
         }
       });
     },
-    status(status: string) {
-      this.$state.progress = status;
+    statusIncrement() {
+      this.$state.progress += 1
+      return
     },
     chopOff(sumup: number, thresholdn = 15, thresholdp = 0.005) {
       this.sampleInfo.forEach((sample) => {

@@ -15,7 +15,7 @@ function tstd(arr: number[], usePopulation = false) {
     arr
       .reduce((acc, val) => acc.concat((val - mean) ** 2), [] as number[])
       .reduce((acc, val) => acc + val, 0) /
-      (arr.length - (usePopulation ? 0 : 1))
+    (arr.length - (usePopulation ? 0 : 1))
   );
 }
 
@@ -50,36 +50,36 @@ function prepareVal(
     );
   return raw.length > 1
     ? (azip(raw) as number[][]).reduce(
-        (mem, val, index) => {
-          const avg = val.reduce((a, b) => a + b, 0) / val.length || 0;
-          const error = tstd(val, true) / Math.sqrt(val.length);
-          mem.bar.push(avg);
-          mem.errorbar.push([
-            index,
-            avg + error,
-            error > avg ? 0 : avg - error,
-          ]);
-          return mem;
-        },
-        {
-          xaxis: xaxis,
-          bar: [] as number[],
-          errorbar: [] as number[][],
-          state: 'success',
-        }
-      )
+      (mem, val, index) => {
+        const avg = val.reduce((a, b) => a + b, 0) / val.length || 0;
+        const error = tstd(val, true) / Math.sqrt(val.length);
+        mem.bar.push(avg);
+        mem.errorbar.push([
+          index,
+          avg + error,
+          error > avg ? 0 : avg - error,
+        ]);
+        return mem;
+      },
+      {
+        xaxis: xaxis,
+        bar: [] as number[],
+        errorbar: [] as number[][],
+        state: 'success',
+      }
+    )
     : (azip(raw) as number[][]).reduce(
-        (mem, val) => {
-          mem.bar.push(val.reduce((a, b) => a + b, 0) / val.length || 0);
-          return mem;
-        },
-        {
-          xaxis: xaxis,
-          bar: [] as number[],
-          errorbar: undefined,
-          state: 'warning',
-        }
-      );
+      (mem, val) => {
+        mem.bar.push(val.reduce((a, b) => a + b, 0) / val.length || 0);
+        return mem;
+      },
+      {
+        xaxis: xaxis,
+        bar: [] as number[],
+        errorbar: undefined,
+        state: 'warning',
+      }
+    );
 }
 
 function deletionChartData(
@@ -242,19 +242,19 @@ function deletionSizeChartData(
   }
   return groupres.length > 1
     ? {
-        type: 'Deletion size',
-        xaxis: countlist,
-        bar: series,
-        errorbar: SEM,
-        state: 'success',
-      }
+      type: 'Deletion size',
+      xaxis: countlist,
+      bar: series,
+      errorbar: SEM,
+      state: 'success',
+    }
     : {
-        type: 'Deletion size',
-        xaxis: countlist,
-        bar: series,
-        errorbar: undefined,
-        state: 'success',
-      };
+      type: 'Deletion size',
+      xaxis: countlist,
+      bar: series,
+      errorbar: undefined,
+      state: 'success',
+    };
 }
 
 function insertionSizeChartData(
@@ -323,19 +323,19 @@ function insertionSizeChartData(
   }
   return groupres.length > 1
     ? {
-        type: 'Insertion size',
-        xaxis: countlist,
-        bar: series,
-        errorbar: SEM,
-        state: 'success',
-      }
+      type: 'Insertion size',
+      xaxis: countlist,
+      bar: series,
+      errorbar: SEM,
+      state: 'success',
+    }
     : {
-        type: 'Insertion size',
-        xaxis: countlist,
-        bar: series,
-        errorbar: undefined,
-        state: 'success',
-      };
+      type: 'Insertion size',
+      xaxis: countlist,
+      bar: series,
+      errorbar: undefined,
+      state: 'success',
+    };
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -349,12 +349,10 @@ export function groupScratch(
     }[];
   }[]
 ) {
+  console.log(alignment)
   alignment.map((group) => ({
     sample: group.sample,
-    res: group.res.filter(
-      (hap) =>
-        hap.count > (group.sample.sumup as number) * 0.0001 && hap.count > 3
-    ),
+    res: group.res,
   }));
   const svgJSON = {
     groupsvgjson: alignment[0].sample.group,
