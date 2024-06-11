@@ -2,7 +2,8 @@
   <br />
   <q-card>
     <div class="echarts" id="echarts"></div>
-    <div id="alignment-result"></div>
+    <!-- <div id="alignment-result"></div> -->
+    <AlignRes :data="props.alignmentResult" :type="props.type" />
     <div align="center">
       <q-btn flat color="secondary" @click="download">Save chart</q-btn>
       <q-btn
@@ -19,10 +20,10 @@
 <script setup lang="ts">
 import { nextTick, onMounted } from 'vue';
 import * as echarts from 'echarts';
-import { AlignmentResult } from 'src/utils/alignment';
 import { multialign } from 'src/stores/interface';
 import { jsPDF } from 'jspdf';
 import 'svg2pdf.js';
+import AlignRes from './AlignmentResult.vue';
 
 const props = defineProps({
   type: {
@@ -42,7 +43,6 @@ const props = defineProps({
 let chartIns: echarts.ECharts;
 
 onMounted(() => {
-  console.log(props.chartData, props.alignmentResult);
   chartIns = echarts.init(
     document.getElementById('echarts') as HTMLElement,
     undefined,
@@ -61,7 +61,7 @@ function resetChart() {
     chartIns
   );
   // alignment result
-  new AlignmentResult().draw(props.alignmentResult, props.type);
+  // new AlignmentResult().draw(props.alignmentResult, props.type);
 }
 
 async function download() {
@@ -154,7 +154,7 @@ function chartPreparation(
           color: 'black',
         },
       },
-      name: name.endsWith('Size') ? 'count' : 'percentage',
+      name: name.endsWith('size') ? 'count' : 'percentage',
     },
     grid: {
       left: '5%',
@@ -169,12 +169,12 @@ function chartPreparation(
               type: 'bar',
               name: 'bar',
               areaStyle: {
-                color: name.endsWith('Size')
+                color: name.endsWith('size')
                   ? 'rgb(239, 148, 118)'
                   : 'rgb(152, 235, 232)',
               },
               itemStyle: {
-                color: name.endsWith('Size')
+                color: name.endsWith('size')
                   ? 'rgb(249, 165, 19)'
                   : 'rgb(88, 202, 224)',
               },
@@ -187,12 +187,12 @@ function chartPreparation(
               type: 'bar',
               name: 'bar',
               areaStyle: {
-                color: name.endsWith('Size')
+                color: name.endsWith('size')
                   ? 'rgb(239, 148, 118)'
                   : 'rgb(152, 235, 232)',
               },
               itemStyle: {
-                color: name.endsWith('Size')
+                color: name.endsWith('size')
                   ? 'rgb(249, 165, 19)'
                   : 'rgb(88, 202, 224)',
               },
@@ -212,7 +212,7 @@ function chartPreparation(
                 const style = api.style({
                   stroke: api.visual('color') as string,
                   fill: undefined,
-                  color: name.endsWith('Size')
+                  color: name.endsWith('size')
                     ? 'rgb(249, 165, 19)'
                     : 'rgb(88, 202, 224)',
                 });

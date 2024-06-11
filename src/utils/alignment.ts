@@ -156,7 +156,7 @@ function getIndices(searchRegExp: RegExp, str: string) {
     for (const indice of indices) {
       length_sum += indice.length;
     }
-    indices.push({ index: match.index - length_sum, length: match[0].length });
+    indices.push({ index: match.index - length_sum + 1, length: match[0].length - 1 });
   }
   return indices;
 }
@@ -220,9 +220,8 @@ class AlignedPair {
       /(A|T|C|G|a|t|c|g)-+(?=(A|T|C|G|a|t|c|g))/g,
       this.reference
     );
-    const new_indices = this.lookbehindAdjust(indices);
     const arrayQuery = this.query.split('');
-    for (const insertion of new_indices) {
+    for (const insertion of indices) {
       arrayQuery.splice(insertion.index, insertion.length);
     }
     return arrayQuery.join('');
@@ -233,25 +232,20 @@ class AlignedPair {
       /(A|T|C|G|a|t|c|g)-+(?=(A|T|C|G|a|t|c|g))/g,
       this.reference
     );
-    const new_indices = this.lookbehindAdjust(indices);
     const arrayQuery = this.query.split('');
     const insertions: { index: number; sequence: string }[] = [];
-    for (const insertion of new_indices) {
+    for (const insertion of indices) {
       const insert = arrayQuery.splice(insertion.index, insertion.length);
       insertions.push({ index: insertion.index, sequence: insert.join('') });
     }
     return insertions;
   }
 
-  lookbehindAdjust(
-    indices: { index: number; length: number }[]
-  ): { index: number; length: number }[] {
-    for (const indice of indices) {
-      indice.index += 1;
-      indice.length -= 1;
-    }
-    return indices;
-  }
+  // lookbehindAdjust(
+  //   indices: { index: number; length: number }[]
+  // ): { index: number; length: number }[] {
+  //   return indices.map(value => ({ index: value.index+1, length: value.length - 1 }))
+  // }
 }
 
 function multiAlign(
